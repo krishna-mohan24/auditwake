@@ -106,6 +106,14 @@ analyze → implement, one feature at a time (001 mcp-tracing, 002 gateway-guard
 Definition of Done: tests pass, evals pass, traces visible, docs updated, ADR recorded,
 costs within budget.
 
+Branching: every change MUST be made on its own branch, never directly on `main`, and merged by
+pull request after CI passes. Branch names MUST match
+`<TYPE>-<SIDE>/<short-kebab-description>` where TYPE is `FEAT`, `FIX` or `DOC` and SIDE is
+`APP` (application code, API, viewer), `AGENT` (agent, tools, model access, guardrails, evals,
+prompts, skills) or `INFRA` (CI, Docker, Terraform, repo and process files). The SIDE is chosen by
+where most of the change lands. Example: `FEAT-AGENT/mcp-allow-list`. Details and the validation
+pattern live in `docs/branching.md`.
+
 ## Governance
 
 This constitution supersedes other practices. Amendments require a written proposal, an
@@ -115,4 +123,4 @@ clarifications. Every PR MUST be reviewed for compliance; added complexity MUST 
 justified in the PR or an ADR. `/speckit-analyze` is run before implementation to detect
 drift between constitution, spec, plan and tasks.
 
-**Version**: 1.2.1 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
+**Version**: 1.3.0 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
