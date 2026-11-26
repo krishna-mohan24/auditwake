@@ -25,6 +25,13 @@
 - **Fake provider**: a stand-in for the AI model that gives scripted, repeatable answers, so tests
   need no API key and cost nothing.
 
+## Clarifications
+
+### Session 2026-11-26
+
+- Q: How does the system tell which agent is calling a tool? → A: Each agent profile has its own
+  secret token; the system finds the profile from the token. Tokens are stored only as hashes.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Agent uses tools within its permissions (Priority: P1)
@@ -128,7 +135,7 @@ results and passes against the baseline; deliberately break the allow-list and c
 
 ### Edge Cases
 
-- Unknown agent identity or empty profile: every tool call is refused (default deny).
+- Missing, invalid or unknown token, or an empty profile: every tool call is refused (default deny).
 - A tool call times out or the tool raises an error: recorded as "failed", the agent gets a clear
   error, and the log chain stays valid.
 - Two tool calls at nearly the same time: both are recorded, in a consistent order, without
@@ -146,8 +153,13 @@ results and passes against the baseline; deliberately break the allow-list and c
 
 - **FR-001**: System MUST expose exactly three demo tools over MCP: get an expense report by ID,
   look up a policy clause by ID, and flag an expense report with a reason.
-- **FR-002**: Each agent MUST have a named profile listing the tools it may call; a tool not on the
-  profile MUST be refused, and an unknown agent MUST be refused for all tools (default deny).
+- **FR-002**: Each agent MUST have a named profile listing the tools it may call and its own secret
+  token. The agent identity MUST be derived from the presented token, never from a name the caller
+  claims. A tool not on the profile MUST be refused; a missing, invalid or unknown token MUST be
+  refused for all tools (default deny).
+- **FR-016**: Agent tokens MUST be stored only as hashes, compared in a way that does not leak
+  information through timing, and MUST never appear in logs, traces or audit entries; the audit
+  entry records the verified agent name only.
 - **FR-003**: System MUST validate every tool input against a defined shape and reject invalid
   input before any tool logic runs.
 - **FR-004**: System MUST write one audit entry per tool call (allowed, denied or failed) containing
@@ -173,7 +185,8 @@ results and passes against the baseline; deliberately break the allow-list and c
 
 ### Key Entities
 
-- **Agent Profile**: a named identity with the set of tools it may call and its purpose.
+- **Agent Profile**: a named identity with the set of tools it may call, its purpose and the hash
+  of its secret token (never the token itself).
 - **Expense Report (synthetic)**: an ID, submitter alias, line items (category, amount, date,
   note) and status. Contains fake personal data for redaction tests.
 - **Policy Clause (synthetic)**: an ID, title and text of a rule in the demo expense policy.
@@ -204,8 +217,8 @@ results and passes against the baseline; deliberately break the allow-list and c
   and one trace span with matching run identifier.
 - **SC-003**: Altering or deleting any single past audit entry is detected by verification in 100%
   of eval tamper cases.
-- **SC-004**: 0 raw values of the fake personal-data fixtures appear in any audit entry, log line
-  or span across the eval set.
+- **SC-004**: 0 raw values of the fake personal-data fixtures or of agent tokens appear in any
+  audit entry, log line or span across the eval set.
 - **SC-005**: The full eval set meets or exceeds its stored baseline: at least
   90% of all cases passing and 100% of security cases (allow-list, redaction, tamper detection)
   passing, and completes in under 60 seconds on a laptop with no network.
