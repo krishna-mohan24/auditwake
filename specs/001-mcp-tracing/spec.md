@@ -33,6 +33,8 @@
   secret token; the system finds the profile from the token. Tokens are stored only as hashes.
 - Q: Should the audit log be one chain or one per run? → A: One global chain across all agents and
   runs.
+- Q: Which kinds of personal data must be hidden before logging or tracing? → A: Names, email
+  addresses, phone numbers and card or bank numbers.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -170,7 +172,10 @@ results and passes against the baseline; deliberately break the allow-list and c
   runs, so that altering, removing or reordering any past entry is detectable by a verification
   command that checks the whole chain.
 - **FR-006**: System MUST redact personal data from inputs and results before they are written to
-  the audit log, structured logs or traces.
+  the audit log, structured logs or traces. In scope: person names, email addresses, phone numbers
+  and card or bank numbers. Tests use fake values only; names are matched against a fixed list of
+  fake names, since arbitrary names cannot be detected reliably. Other kinds (street addresses,
+  government IDs) are out of scope for 001.
 - **FR-007**: System MUST emit one trace span per tool call and per model call, carrying agent,
   tool or model name, duration and outcome, all under a single run identifier.
 - **FR-008**: Structured log lines MUST include the same run identifier as the trace and audit log.
