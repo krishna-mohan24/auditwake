@@ -31,6 +31,8 @@
 
 - Q: How does the system tell which agent is calling a tool? → A: Each agent profile has its own
   secret token; the system finds the profile from the token. Tokens are stored only as hashes.
+- Q: Should the audit log be one chain or one per run? → A: One global chain across all agents and
+  runs.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -138,8 +140,8 @@ results and passes against the baseline; deliberately break the allow-list and c
 - Missing, invalid or unknown token, or an empty profile: every tool call is refused (default deny).
 - A tool call times out or the tool raises an error: recorded as "failed", the agent gets a clear
   error, and the log chain stays valid.
-- Two tool calls at nearly the same time: both are recorded, in a consistent order, without
-  breaking the chain.
+- Two tool calls at nearly the same time: both are recorded one after the other in the single
+  chain, in a consistent order, without breaking it.
 - Very large or hostile input (oversized text, special characters): rejected or safely truncated
   in the log; never crashes the server.
 - Audit log storage is unavailable: tool calls that need auditing are refused rather than running
@@ -164,8 +166,9 @@ results and passes against the baseline; deliberately break the allow-list and c
   input before any tool logic runs.
 - **FR-004**: System MUST write one audit entry per tool call (allowed, denied or failed) containing
   agent, tool, redacted input summary, outcome, run identifier and timestamp.
-- **FR-005**: Audit entries MUST be append-only and chained so that altering or removing any past
-  entry is detectable by a verification command.
+- **FR-005**: Audit entries MUST be append-only and form a single chain across all agents and
+  runs, so that altering, removing or reordering any past entry is detectable by a verification
+  command that checks the whole chain.
 - **FR-006**: System MUST redact personal data from inputs and results before they are written to
   the audit log, structured logs or traces.
 - **FR-007**: System MUST emit one trace span per tool call and per model call, carrying agent,
@@ -192,7 +195,8 @@ results and passes against the baseline; deliberately break the allow-list and c
 - **Policy Clause (synthetic)**: an ID, title and text of a rule in the demo expense policy.
 - **Tool Call Record**: one attempted tool call: agent, tool, redacted input summary, outcome,
   duration, run identifier.
-- **Audit Entry**: a tool call record plus the fingerprint of the previous entry, forming a chain.
+- **Audit Entry**: a tool call record plus the fingerprint of the previous entry in the single
+  global chain.
 - **Run**: one execution of the demo agent, identified by a run ID shared by logs, trace and audit.
 - **Eval Case / Baseline**: a scripted scenario with expected outcome, and the saved scores that
   future runs must meet or beat.
