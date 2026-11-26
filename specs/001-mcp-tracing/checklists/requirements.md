@@ -1,3 +1,4 @@
+<!-- What this file is: Quality check on the spec, done before planning. -->
 # Specification Quality Checklist: MCP Tools, Audit Log and Tracing
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning

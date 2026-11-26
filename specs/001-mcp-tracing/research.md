@@ -1,3 +1,4 @@
+<!-- What this file is: Evidence behind the plan's choices: options checked, prices and sources. -->
 # Research: 001 MCP Tools, Audit Log and Tracing
 
 Checked 2026-11-26. Every decision follows the `auditwake-architect` rubric (constitution, cost,

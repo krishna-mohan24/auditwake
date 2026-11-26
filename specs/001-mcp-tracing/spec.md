@@ -1,3 +1,4 @@
+<!-- What this file is: WHAT and WHY: user stories and requirements, with no tech choices. -->
 # Feature Specification: MCP Tools, Audit Log and Tracing
 
 **Feature Branch**: `001-mcp-tracing`
