@@ -114,7 +114,7 @@ prompts, skills) or `INFRA` (CI, Docker, Terraform, repo and process files). The
 where most of the change lands. Example: `FEAT-AGENT/mcp-allow-list`. Commit messages and pull request titles MUST use
 `<type emoji><side emoji> <TYPE>-<SIDE>: <summary>` with the fixed mapping FEAT ✨, FIX 🐛, DOC 📝
 and APP 💻, AGENT 🤖, INFRA 🔧; branch names stay ASCII. A pre-commit hook enforces the format and
-blocks commits on `main`. Details and the validation patterns live in `docs/branching.md`.
+blocks commits on `main`, and a CI check validates each pull request's branch name and title. Details and the validation patterns live in `docs/branching.md`.
 
 ## Governance
 
@@ -125,4 +125,4 @@ clarifications. Every PR MUST be reviewed for compliance; added complexity MUST 
 justified in the PR or an ADR. `/speckit-analyze` is run before implementation to detect
 drift between constitution, spec, plan and tasks.
 
-**Version**: 1.4.0 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
+**Version**: 1.4.1 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24

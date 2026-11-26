@@ -1,0 +1,29 @@
+name: checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.4.0
+      - name: Ruff lint
+        run: uvx ruff@0.17.6 check .
+      - name: Ruff format check
+        run: uvx ruff@0.17.6 format --check .
+      - name: Rule tests
+        run: uvx pytest -q tests/unit/test_commit_rules.py
+  naming:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Branch name and PR title
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: python3 scripts/check_pr_meta.py
