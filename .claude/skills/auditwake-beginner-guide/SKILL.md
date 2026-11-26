@@ -54,3 +54,16 @@ PII redaction, CI gates, Docker and compose, Terraform, secrets, SLI/SLO, ADRs.
 - [ ] Is there any forward reference to a concept taught later?
 - [ ] Does each task have a test-first step and a "done when" that can be checked?
 - [ ] Are terms defined in the glossary?
+
+## Asking the owner questions (clarify, specify, plan, any decision)
+
+Questions must be quick to read and easy to review. Use this format every time:
+
+- **One question at a time**, one line, plain words, ending in `?`.
+- **Why it matters**: one short sentence, no jargon (or define the term inline).
+- **Options**: 2 to 4 rows, each at most about 12 words, in a table. Say what happens, not theory.
+- **Recommended**: one option letter plus one short reason (a single line).
+- **How to reply**: end with "Reply with a letter, or 'yes' for the recommendation."
+- No long paragraphs, no stacked sub-questions, no background lecture. If a concept is needed,
+  explain it in one sentence and add it to `docs/glossary.md`.
+- After the answer, state in one line what changed in the spec, then ask the next question.
