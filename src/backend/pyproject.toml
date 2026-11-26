@@ -7,7 +7,7 @@ requires-python = ">=3.14"
 dependencies = []
 
 [dependency-groups]
-dev = ["pytest>=9.2"]
+dev = ["pytest>=9.2", "mypy>=2.4.1", "ruff==0.17.6"]
 
 [build-system]
 requires = ["hatchling>=1.27"]
@@ -18,3 +18,7 @@ packages = ["auditwake_backend"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.mypy]
+strict = true
+packages = ["auditwake_backend"]
