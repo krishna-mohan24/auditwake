@@ -1,0 +1,30 @@
+# Local services for development (T003). Start with: docker compose -f infra/compose.yaml up -d
+# Local only: the password below is a throwaway dev value, never used outside this laptop.
+name: auditwake
+
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: auditwake
+      POSTGRES_PASSWORD: auditwake_dev
+      POSTGRES_DB: auditwake
+    # Host port 55432, not 5432, so it never clashes with a Postgres already on your machine.
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auditwake -d auditwake"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.76.0
+    ports:
+      - "127.0.0.1:${JAEGER_UI_PORT:-16686}:16686" # web UI
+      - "127.0.0.1:4318:4318" # OTLP over HTTP: where the app sends traces
+
+volumes:
+  postgres-data:

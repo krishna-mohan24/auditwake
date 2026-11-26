@@ -34,7 +34,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
   - **Concept**: a *linter* finds mistakes without running code; *type checking* (mypy) catches wrong data types early.
   - **Test first**: add a deliberately bad line, confirm `make check` fails, then remove it.
   - **Done when**: `make check` passes on the clean tree.
-- [ ] T003 [P] Add local services in `infra/compose.yaml` (Postgres and Jaeger)
+- [x] T003 [P] Add local services in `infra/compose.yaml` (Postgres and Jaeger)
   - **Goal**: `docker compose up -d` starts a database and a trace viewer.
   - **Concept**: *Docker Compose* starts several containers together; this keeps the project *local-first* (constitution XI).
   - **Test first**: a script `pipelines/check_services.py` that connects to Postgres on the configured port and fails if it cannot.
