@@ -207,15 +207,13 @@ results and passes against the baseline; deliberately break the allow-list and c
 - **SC-004**: 0 raw values of the fake personal-data fixtures appear in any audit entry, log line
   or span across the eval set.
 - **SC-005**: The full eval set meets or exceeds its stored baseline: at least
-  [NEEDS CLARIFICATION: proposed 90% of all cases pass and 100% of security cases pass; confirm or
-  change thresholds] and completes in under 60 seconds on a laptop with no network.
+  90% of all cases passing and 100% of security cases (allow-list, redaction, tamper detection)
+  passing, and completes in under 60 seconds on a laptop with no network.
 - **SC-006**: Auditing and tracing add a median delay of under
-  [NEEDS CLARIFICATION: proposed 50 milliseconds per tool call, measured locally; confirm or change]
-  compared with running the same call without them. The figure recorded in the docs MUST be the
+  50 milliseconds per tool call, measured locally, compared with running the same call without them. The figure recorded in the docs MUST be the
   measured one.
 - **SC-007**: Audit entries are kept for
-  [NEEDS CLARIFICATION: proposed 90 days for synthetic demo data; confirm retention period] and the
-  retention rule is documented.
+  90 days (synthetic demo data) and the retention rule is documented.
 - **SC-008**: A new developer can run the demo agent, the evals and the log verification from the
   README using one documented command each, with no cloud account or API key.
 
