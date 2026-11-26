@@ -22,7 +22,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
 
 ## Phase 1: Setup
 
-- [ ] T001 Create the Python project skeleton in `pyproject.toml`, `src/auditwake/__init__.py`, `uv.lock`
+- [x] T001 Create the Python project skeleton in `pyproject.toml`, `src/auditwake/__init__.py`, `uv.lock`
   - **Goal**: a project that installs with one command.
   - **Concept**: *uv* is a fast Python package and environment manager; a *lock file* pins exact versions so everyone gets identical installs (reproducible builds).
   - **Test first**: a test `tests/unit/test_import.py` that does `import auditwake` and checks `auditwake.__version__`.
