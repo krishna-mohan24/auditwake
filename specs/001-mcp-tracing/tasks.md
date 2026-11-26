@@ -28,7 +28,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
   - **Concept**: *uv* is a fast Python package and environment manager; a *lock file* pins exact versions so everyone gets identical installs (reproducible builds).
   - **Test first**: a test `tests/unit/test_import.py` that does `import auditwake` and checks `auditwake.__version__`.
   - **Done when**: `uv sync` then `uv run pytest` passes with 1 test.
-  - **If it goes wrong**: "Python 3.12 not found" → `uv python install 3.12`.
+  - **If it goes wrong**: "Python 3.14 not found" → `uv python install 3.14`.
 - [ ] T002 [P] Add lint, format and type checks in `ruff.toml` (extend), `src/backend/pyproject.toml`, `src/agents/pyproject.toml`, `Makefile`
   - **Goal**: `make check` runs ruff, mypy and pytest.
   - **Concept**: a *linter* finds mistakes without running code; *type checking* (mypy) catches wrong data types early.

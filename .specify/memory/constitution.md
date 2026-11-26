@@ -6,7 +6,7 @@ evidence; it never claims compliance.
 ## Core Principles
 
 ### I. Python-First, One Documented Exemption
-Backend, evals, tracing, guardrails and infra tooling MUST be Python 3.12 managed with uv.
+Backend, evals, tracing, guardrails and infra tooling MUST be Python 3.14 managed with uv.
 Go, Rust and Ruby MUST NOT be used. React + TypeScript is permitted ONLY under `/web`, as a
 read-only thin client using a client generated from the FastAPI OpenAPI spec; no Node
 backend logic is allowed. This exemption MUST be recorded as an ADR. Any further language
@@ -125,4 +125,4 @@ clarifications. Every PR MUST be reviewed for compliance; added complexity MUST 
 justified in the PR or an ADR. `/speckit-analyze` is run before implementation to detect
 drift between constitution, spec, plan and tasks.
 
-**Version**: 1.4.1 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
+**Version**: 1.4.2 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-26 (Python 3.12 → 3.14, PATCH)
