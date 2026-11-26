@@ -21,7 +21,7 @@ These are the target commands; tasks create them.
    run id printed in step 4.
 8. Prove tamper detection: run the documented `psql` edit of one entry (as the owner role), then
    `uv run auditwake verify-log` — expect `BROKEN at seq=K`.
-9. `uv run auditwake eval` — expect per-case results and PASS against `evals/baseline.json`.
+9. `uv run auditwake eval` — expect per-case results and PASS against `src/agents/evals/baseline.json`.
 10. `make check` (or `uv run pytest && uv run ruff check . && uv run mypy .`) — one command for
     everything.
 

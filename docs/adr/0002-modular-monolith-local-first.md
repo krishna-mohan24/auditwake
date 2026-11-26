@@ -6,7 +6,7 @@
 One owner plus at most 5 users, near-zero budget, beginner builder.
 
 ## Decision
-One Python package (`src/auditwake/...`), one process, run locally with docker compose + uv. Cloud is an optional layer.
+One process (code layout refined by ADR-0011), run locally with docker compose + uv. Cloud is an optional layer.
 
 ## Alternatives considered
 Microservices; cloud-only development.

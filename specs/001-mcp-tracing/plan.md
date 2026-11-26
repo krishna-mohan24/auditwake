@@ -107,38 +107,41 @@ specs/001-mcp-tracing/
 
 ### Source Code (repository root)
 
+Layout follows ADR-0011: two Python projects under `src/`, one process in 001.
+
 ```text
-src/auditwake/
-├── cli.py                 # commands: run-agent, verify-log, eval, create-token
-├── config.py              # settings from environment (pydantic)
-├── agent/                 # profiles, scripted demo agent, run status
-├── tools/                 # MCP server, three tools, input schemas
-├── model_access/          # provider interface + deterministic fake (real providers in 002)
-├── guardrails/            # token auth, allow-list gate, redaction
-├── telemetry/             # tracing setup, JSON logging, audit chain, verifier
-├── storage/               # Postgres pool, migrations, repositories
-└── retrieval/             # created in 003, not in 001
-tests/
-├── unit/  integration/  contract/  e2e/
-evals/
-├── cases/*.yaml           # 12 versioned cases
-├── baseline.json          # stored scores
-└── run_evals.py
-data/                      # synthetic reports.json, policy.json
-config/agents.yaml         # profiles + token hashes (never raw tokens)
-Dockerfile  .dockerignore  compose.yaml  Makefile
-scripts/                   # check_services.py, bench_overhead.py, load_check.py, check_commit_msg.py
-tests/fixtures/            # fake_pii.json
-infra/terraform/           # written in 001, applied from 002
+src/
+├── backend/                        # own pyproject.toml + uv.lock; never imports agents
+│   ├── auditwake_backend/
+│   │   ├── config.py               # settings from environment (pydantic)
+│   │   ├── storage/                # Postgres pool, migrations, repositories
+│   │   └── telemetry/              # tracing setup, JSON logging, audit chain, verifier
+│   └── tests/unit/
+├── agents/                         # own pyproject.toml + uv.lock; depends on backend (local path)
+│   ├── auditwake_agents/
+│   │   ├── cli.py                  # commands: run-agent, verify-log, eval, create-token
+│   │   ├── agent/                  # profiles, scripted demo agent, run status
+│   │   ├── tools/                  # MCP server, three tools, input schemas
+│   │   ├── model_access/           # provider interface + deterministic fake (real providers in 002)
+│   │   └── guardrails/             # token auth, allow-list gate, redaction
+│   ├── evals/                      # cases/*.yaml (12 versioned cases), baseline.json, run_evals.py
+│   └── tests/unit/
+└── frontend/                       # created in 004, not in 001
+tests/                              # cross-project: integration/ contract/ e2e/ fixtures/ conftest.py
+data/                               # synthetic reports.json, policy.json
+config/agents.yaml                  # profiles + token hashes (never raw tokens)
+infra/                              # compose.yaml, Dockerfile, terraform/ (written in 001, applied from 002)
+pipelines/                          # check_services.py, bench_overhead.py, load_check.py,
+                                    # check_commit_msg.py, check_pr_meta.py
+Makefile  ruff.toml  .dockerignore  .env.example
 docs/ adr/ glossary.md measurements.md runbook.md threat-model.md retention.md rollback.md
      branching.md dev-tooling.md spikes/mcp-sdk.md
-.github/workflows/         # ci.yml (lint, type, test, evals, build, audit), secret-scan.yml
+.github/workflows/                  # ci.yml (lint, type, test, evals, build, audit); GitHub requires this path
 ```
 
-**Structure Decision**: single project. `storage/` is added to the layout you gave
-(`agent, tools, model_access, retrieval, guardrails, telemetry`) because Postgres access needs a
-home that is not telemetry or tools. `retrieval/` stays empty until feature 003 so nothing unused
-is built.
+**Structure Decision**: two projects, one process (ADR-0011). `agents` imports `backend`, never the
+reverse. `storage/` stays on the backend side because Postgres access needs a home that is not
+telemetry or tools. `retrieval/` (003) will be added under `src/agents/` later so nothing unused is built.
 
 ## Key Design Decisions (each has an ADR)
 
