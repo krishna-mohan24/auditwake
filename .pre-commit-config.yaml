@@ -9,3 +9,10 @@ repos:
     hooks:
       - id: ruff-check
       - id: ruff-format
+  - repo: local
+    hooks:
+      - id: commit-rules
+        name: commit message and branch rules
+        entry: python3 scripts/check_commit_msg.py
+        language: system
+        stages: [commit-msg]
