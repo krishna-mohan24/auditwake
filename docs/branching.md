@@ -52,14 +52,25 @@ Examples:
 - `🐛🤖 FIX-AGENT: redact phone numbers in summaries`
 - `📝🔧 DOC-INFRA: add commit emoji rule`
 
-Rules enforced by the `commit-rules` pre-commit hook (`scripts/check_commit_msg.py`):
+Rules enforced locally by the `commit-rules` pre-commit hook (`scripts/check_commit_msg.py`):
 1. Subject matches the format and both emojis match the TYPE and SIDE.
 2. You are not committing on `main` or a detached HEAD.
 3. The branch name matches the pattern above.
 4. Merge and revert commits are exempt. Attribution trailers (Co-Authored-By) go in the body.
 
 Enable on a fresh clone: `pre-commit install && pre-commit install --hook-type commit-msg`.
-The pull request title uses the same format. Changing a mapping needs a constitution amendment.
+The pull request title uses the same format.
+
+## CI enforcement
+
+`.github/workflows/ci.yml` (one workflow, three jobs) runs on every push and pull request:
+- `gitleaks`: secret scan of the full history.
+- `ruff`: lint, format check and the unit tests for these rules.
+- `naming` (pull requests only): the pull request's branch name and title must match the rules (`scripts/check_pr_meta.py`).
+  Dependabot branches (`dependabot/...`) are exempt from the branch rule; titles are still checked.
+
+GitHub branch protection (making these checks required to merge) needs a paid plan or a public repo,
+so for now a failing check is a signal you must honour, not a hard block. Changing a mapping needs a constitution amendment.
 
 ## Workflow
 
