@@ -80,6 +80,23 @@ so for now a failing check is a signal you must honour, not a hard block. Changi
 4. Push the branch, open a pull request, wait for CI to be green, merge, delete the branch.
 5. One spec task or small group of tasks per branch, so each pull request is easy to review.
 
+## Pull request rules
+
+- **Merge style: squash merge.** `main` gets one commit per pull request, using the PR title (so the
+  title format above matters). Delete the branch after merging.
+- **Size:** one concern per pull request, aim for under about 400 changed lines. Group spec tasks only
+  when they are tiny and touch the same files.
+- **Order:** merge in task order (Setup, Foundational, stories 1 to 4, Polish). Never merge a PR that
+  depends on one not yet merged. `main` must stay green and runnable.
+- **Task link:** put the task ID (for example `T002`) in the PR body and tick its box in
+  `specs/<feature>/tasks.md` in the same PR.
+- **Tests ship with the code** (constitution II). No code PR without its test.
+- **Extra review** for anything touching permissions or the audit chain (stories 1 and 2): run
+  `/code-review` before merging.
+- **Eval baseline:** a PR that changes eval results updates the stored baseline in the same PR.
+- **One feature at a time:** start 002 only after every 001 PR is merged.
+- The PR description follows `.github/pull_request_template.md`.
+
 ## Existing work
 
 The first spec, plan and task commits were made before this rule existed, so they sit on `main`.
