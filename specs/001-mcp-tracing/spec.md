@@ -37,6 +37,8 @@
   addresses, phone numbers and card or bank numbers.
 - Q: What should the flag tool actually change? → A: It stores a separate flag record; the original
   report is never modified.
+- Q: After a refused tool call, should the demo agent keep going? → A: It continues with its other
+  steps and the run ends marked "completed with denials".
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -63,6 +65,9 @@ while the auditor can do both.
    is rejected with a clear validation message and no side effect occurs.
 4. **Given** a tool name that does not exist, **When** the agent calls it, **Then** it is refused
    and recorded like any other denied call.
+5. **Given** a run where one call is refused and the rest are allowed, **When** the run ends,
+   **Then** the agent has continued with its remaining steps and the run is marked "completed with
+   denials".
 
 ---
 
@@ -195,6 +200,9 @@ results and passes against the baseline; deliberately break the allow-list and c
 - **FR-017**: The flag tool MUST store a separate flag record (report ID, reason, flagging agent,
   time) and MUST NOT modify the original report; flagging the same report twice creates two
   records, and both are audited.
+- **FR-018**: A run MUST end with exactly one status: "completed" (no refusals or failures),
+  "completed with denials" (at least one refusal, none failed), or "failed" (a call failed in a
+  way the agent could not recover from). A refused call MUST NOT stop the run by itself.
 
 ### Key Entities
 
@@ -209,7 +217,8 @@ results and passes against the baseline; deliberately break the allow-list and c
   duration, run identifier.
 - **Audit Entry**: a tool call record plus the fingerprint of the previous entry in the single
   global chain.
-- **Run**: one execution of the demo agent, identified by a run ID shared by logs, trace and audit.
+- **Run**: one execution of the demo agent, identified by a run ID shared by logs, trace and audit,
+  and ending with one status (completed, completed with denials, or failed).
 - **Eval Case / Baseline**: a scripted scenario with expected outcome, and the saved scores that
   future runs must meet or beat.
 
