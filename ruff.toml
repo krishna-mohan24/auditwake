@@ -1,0 +1,2 @@
+# Spec Kit's own scripts are vendored; don't reformat them.
+extend-exclude = [".specify"]

@@ -35,7 +35,9 @@ Thresholds change only via a reviewed commit that explains why.
 ### V. Least Privilege and Defense in Depth
 Each agent MUST have an explicit tool allow-list; default is deny. Inputs MUST be
 validated with Pydantic. PII MUST be redacted before anything is logged or traced. Secrets
-live in Secret Manager only, with CI secret scanning. CORS MUST be limited to the viewer
+live in Secret Manager only. No commit may contain a secret: a pre-commit secret scan (gitleaks)
+MUST pass locally and the same scan MUST run in CI on every push and pull request; a finding
+blocks the merge and the leaked credential MUST be revoked, not just deleted. CORS MUST be limited to the viewer
 origin. Per-key rate limits are required. Only low-cost controls are adopted; paid
 scanners, WAFs and pen tests are out of scope.
 
@@ -113,4 +115,4 @@ clarifications. Every PR MUST be reviewed for compliance; added complexity MUST 
 justified in the PR or an ADR. `/speckit-analyze` is run before implementation to detect
 drift between constitution, spec, plan and tasks.
 
-**Version**: 1.2.0 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
+**Version**: 1.2.1 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
