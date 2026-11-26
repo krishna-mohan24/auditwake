@@ -63,9 +63,10 @@ The pull request title uses the same format.
 
 ## CI enforcement
 
-`.github/workflows/checks.yml` runs on every pull request:
+`.github/workflows/ci.yml` (one workflow, three jobs) runs on every push and pull request:
+- `gitleaks`: secret scan of the full history.
 - `ruff`: lint, format check and the unit tests for these rules.
-- `naming`: the pull request's branch name and title must match the rules (`scripts/check_pr_meta.py`).
+- `naming` (pull requests only): the pull request's branch name and title must match the rules (`scripts/check_pr_meta.py`).
   Dependabot branches (`dependabot/...`) are exempt from the branch rule; titles are still checked.
 
 GitHub branch protection (making these checks required to merge) needs a paid plan or a public repo,
