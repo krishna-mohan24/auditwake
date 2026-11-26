@@ -32,6 +32,35 @@ Every change gets its own branch and a pull request. Nobody commits directly to 
 | `DOC-INFRA/branch-naming-rule` | process documentation |
 | `DOC-APP/threat-model` | docs describing the application |
 
+## Commit and pull request titles (fixed format)
+
+```
+<type emoji><side emoji> <TYPE>-<SIDE>: <short summary>
+```
+
+The two emojis are fixed, not chosen freely. Branch names stay plain ASCII (no emoji) because emoji in
+branch names break many tools.
+
+| TYPE | Emoji | | SIDE | Emoji |
+|---|---|---|---|---|
+| `FEAT` | ✨ | | `APP` | 💻 |
+| `FIX` | 🐛 | | `AGENT` | 🤖 |
+| `DOC` | 📝 | | `INFRA` | 🔧 |
+
+Examples:
+- `✨🤖 FEAT-AGENT: add allow-list gate`
+- `🐛🤖 FIX-AGENT: redact phone numbers in summaries`
+- `📝🔧 DOC-INFRA: add commit emoji rule`
+
+Rules enforced by the `commit-rules` pre-commit hook (`scripts/check_commit_msg.py`):
+1. Subject matches the format and both emojis match the TYPE and SIDE.
+2. You are not committing on `main` or a detached HEAD.
+3. The branch name matches the pattern above.
+4. Merge and revert commits are exempt. Attribution trailers (Co-Authored-By) go in the body.
+
+Enable on a fresh clone: `pre-commit install && pre-commit install --hook-type commit-msg`.
+The pull request title uses the same format. Changing a mapping needs a constitution amendment.
+
 ## Workflow
 
 1. `git switch main && git pull`
