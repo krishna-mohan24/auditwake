@@ -15,7 +15,7 @@ Research and decisions: [research.md](research.md). ADRs: [docs/adr/](../../docs
 
 ## Technical Context
 
-**Language/Version**: Python 3.12, managed with uv (`uv.lock` committed)
+**Language/Version**: Python 3.14, managed with uv (`uv.lock` committed)
 
 **Primary Dependencies**: `mcp` (official SDK, 2.x), `opentelemetry-sdk` and OTLP/HTTP exporter,
 `pydantic` v2, `psycopg` 3 with pool, `structlog`, `pyyaml`. Dev: `pytest`, `pytest-asyncio`,
@@ -46,7 +46,7 @@ if the audit log is unavailable; trace backend failure must never stop a run
 
 | # | Principle | Status | How this plan complies |
 |---|---|---|---|
-| I | Python-first | Pass | All code Python 3.12; `/web` not touched until feature 004 (ADR-0001) |
+| I | Python-first | Pass | All code Python 3.14; `/web` not touched until feature 004 (ADR-0001) |
 | II | Test-first | Pass | Every task writes the failing test first (see tasks later); pyramid in this plan |
 | III | Keyless CI | Pass | Fake provider only in 001; contract tests snapshot MCP tool schemas |
 | IV | Evals gate build | Pass | 12 cases, baseline file, CI step fails below 90% / 100% security |

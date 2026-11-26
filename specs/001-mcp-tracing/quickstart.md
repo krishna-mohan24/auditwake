@@ -6,7 +6,7 @@ These are the target commands; tasks create them.
 
 ## Prerequisites
 
-- Docker Desktop running, `uv` installed, Python 3.12 (uv installs it).
+- Docker Desktop running, `uv` installed, Python 3.14 (uv installs it).
 
 ## Steps
 
