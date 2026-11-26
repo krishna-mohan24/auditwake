@@ -1,6 +1,7 @@
 ---
 description: "Task list for 001-mcp-tracing"
 ---
+<!-- What this file is: The backlog: 45 small ordered tasks, ticked off as they are built. -->
 
 # Tasks: MCP Tools, Audit Log and Tracing
 

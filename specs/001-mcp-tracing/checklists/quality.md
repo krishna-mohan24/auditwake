@@ -1,3 +1,4 @@
+<!-- What this file is: Review checklist: are the spec, plan and contracts clear and complete enough to build from? -->
 # Requirements Quality Checklist: 001 MCP Tools, Audit Log and Tracing
 
 **Purpose**: "Unit tests for the requirements": are spec.md, plan.md and the contracts complete, clear, consistent and measurable enough to build from?

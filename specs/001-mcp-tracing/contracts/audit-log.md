@@ -1,3 +1,4 @@
+<!-- What this file is: The exact format of an audit-log entry and how the hash chain is verified. -->
 # Contract: audit log and verification
 
 ## Entry (as stored and hashed)

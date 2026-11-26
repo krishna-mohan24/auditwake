@@ -1,3 +1,4 @@
+<!-- What this file is: Step-by-step check that the finished feature works on your laptop. -->
 # Quickstart: validate 001 end to end
 
 Goal: prove the feature works on your laptop with no cloud account and no API key (SC-008).

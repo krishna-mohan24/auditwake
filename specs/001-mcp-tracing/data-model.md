@@ -1,3 +1,4 @@
+<!-- What this file is: The database tables and fields, with plain-language notes. -->
 # Data Model: 001
 
 Plain-language notes in italics for beginners.

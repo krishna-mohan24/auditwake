@@ -1,3 +1,4 @@
+<!-- What this file is: The exact inputs, outputs and errors of the three MCP tools. -->
 # Contract: MCP tools
 
 Contract tests snapshot the server's tool list (names, descriptions, input schemas). Any unplanned

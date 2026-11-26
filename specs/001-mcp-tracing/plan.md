@@ -1,3 +1,4 @@
+<!-- What this file is: HOW: tech choices, project layout, risks and design decisions. -->
 # Implementation Plan: MCP Tools, Audit Log and Tracing
 
 **Branch**: `001-mcp-tracing` | **Date**: 2026-11-26 | **Spec**: [spec.md](spec.md)
