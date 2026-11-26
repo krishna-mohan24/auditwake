@@ -35,6 +35,8 @@
   runs.
 - Q: Which kinds of personal data must be hidden before logging or tracing? → A: Names, email
   addresses, phone numbers and card or bank numbers.
+- Q: What should the flag tool actually change? → A: It stores a separate flag record; the original
+  report is never modified.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -161,9 +163,6 @@ results and passes against the baseline; deliberately break the allow-list and c
   token. The agent identity MUST be derived from the presented token, never from a name the caller
   claims. A tool not on the profile MUST be refused; a missing, invalid or unknown token MUST be
   refused for all tools (default deny).
-- **FR-016**: Agent tokens MUST be stored only as hashes, compared in a way that does not leak
-  information through timing, and MUST never appear in logs, traces or audit entries; the audit
-  entry records the verified agent name only.
 - **FR-003**: System MUST validate every tool input against a defined shape and reject invalid
   input before any tool logic runs.
 - **FR-004**: System MUST write one audit entry per tool call (allowed, denied or failed) containing
@@ -190,6 +189,12 @@ results and passes against the baseline; deliberately break the allow-list and c
 - **FR-014**: Tool descriptions and the tool contract (names, inputs, outputs) MUST be covered by
   contract tests so unintended changes fail the build.
 - **FR-015**: All demo data MUST be synthetic; test personal data MUST be fake.
+- **FR-016**: Agent tokens MUST be stored only as hashes, compared in a way that does not leak
+  information through timing, and MUST never appear in logs, traces or audit entries; the audit
+  entry records the verified agent name only.
+- **FR-017**: The flag tool MUST store a separate flag record (report ID, reason, flagging agent,
+  time) and MUST NOT modify the original report; flagging the same report twice creates two
+  records, and both are audited.
 
 ### Key Entities
 
@@ -197,6 +202,8 @@ results and passes against the baseline; deliberately break the allow-list and c
   of its secret token (never the token itself).
 - **Expense Report (synthetic)**: an ID, submitter alias, line items (category, amount, date,
   note) and status. Contains fake personal data for redaction tests.
+- **Flag Record**: a stored note that a report was flagged: report ID, reason, flagging agent, time.
+  Kept separate from the report, which stays unchanged.
 - **Policy Clause (synthetic)**: an ID, title and text of a rule in the demo expense policy.
 - **Tool Call Record**: one attempted tool call: agent, tool, redacted input summary, outcome,
   duration, run identifier.
