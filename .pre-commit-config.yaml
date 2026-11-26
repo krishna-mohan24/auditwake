@@ -13,6 +13,6 @@ repos:
     hooks:
       - id: commit-rules
         name: commit message and branch rules
-        entry: python3 scripts/check_commit_msg.py
+        entry: python3 pipelines/check_commit_msg.py
         language: system
         stages: [commit-msg]

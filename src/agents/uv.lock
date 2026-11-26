@@ -3,14 +3,28 @@ revision = 3
 requires-python = ">=3.12"
 
 [[package]]
-name = "auditwake"
+name = "auditwake-agents"
 version = "0.1.0"
 source = { editable = "." }
+dependencies = [
+    { name = "auditwake-backend" },
+]
 
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
 ]
+
+[package.metadata]
+requires-dist = [{ name = "auditwake-backend", editable = "../backend" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.2" }]
+
+[[package]]
+name = "auditwake-backend"
+version = "0.1.0"
+source = { editable = "../backend" }
 
 [package.metadata]
 
