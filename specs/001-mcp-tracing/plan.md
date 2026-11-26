@@ -58,6 +58,9 @@ if the audit log is unavailable; trace backend failure must never stop a run
 | XI | Local-first | Pass | `docker compose up` + `uv run` is the whole setup |
 | XII | Beginner-friendly | Pass | Tasks follow the beginner guide format; glossary added |
 
+**Deferred to 002 by design** (not forgotten): `terraform plan` and deploy-on-tag in CI, HTTP
+health/readiness endpoints, per-key rate limits, CORS, OpenAPI diff and record/replay.
+
 **NFR coverage map** (every NFR has a spec criterion, a task and a test; 001 covers the rows marked
 "001", the rest are scheduled and checked by `/speckit-analyze`):
 
@@ -123,9 +126,12 @@ evals/
 └── run_evals.py
 data/                      # synthetic reports.json, policy.json
 config/agents.yaml         # profiles + token hashes (never raw tokens)
-docker/ Dockerfile compose.yaml
+Dockerfile  .dockerignore  compose.yaml  Makefile
+scripts/                   # check_services.py, bench_overhead.py, load_check.py, check_commit_msg.py
+tests/fixtures/            # fake_pii.json
 infra/terraform/           # written in 001, applied from 002
-docs/ adr/ glossary.md measurements.md runbook.md threat-model.md
+docs/ adr/ glossary.md measurements.md runbook.md threat-model.md retention.md rollback.md
+     branching.md dev-tooling.md spikes/mcp-sdk.md
 .github/workflows/         # ci.yml (lint, type, test, evals, build, audit), secret-scan.yml
 ```
 
@@ -147,7 +153,9 @@ is built.
    (ADR-0005).
 4. **Fail closed**: the flag record and its audit entry are written in one transaction. If the audit
    write fails, the tool result is withheld and the call is reported failed.
-5. **Run id = trace id**: one identifier across span, log lines and audit entries (FR-008).
+5. **Run id = trace id**: one identifier across span, log lines and audit entries (FR-008). It is
+   generated at run start in trace-id format (32 hex characters) so the same value is later used as
+   the trace id; no rework when tracing arrives.
 6. **Telemetry never blocks**: bounded span queue, short export timeout, drop on failure (FR-010).
 7. **Redaction**: regex for emails and phones, Luhn check for card numbers, fixed fake-name list
    (ADR-0007).
