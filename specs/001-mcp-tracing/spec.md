@@ -22,6 +22,8 @@
   model call) with timing and details. Reviewers read traces to see what the agent did.
 - **Eval**: a fixed set of test cases that checks the agent behaves correctly, scored the same way
   every time. A *baseline* is the saved score we must not drop below.
+- **Run id**: one identifier for a whole agent run. It is the same value as the trace id, and it
+  appears in the trace, the log lines and every audit entry.
 - **Fake provider**: a stand-in for the AI model that gives scripted, repeatable answers, so tests
   need no API key and cost nothing.
 
@@ -74,7 +76,7 @@ while the auditor can do both.
 ### User Story 2 - Every call is recorded in a tamper-evident audit log (Priority: P1)
 
 A reviewer can see, for any agent run, an ordered record of every tool call: the agent, the tool,
-a safe summary of inputs, the outcome (allowed, denied, failed), and when it happened. If someone
+a redacted summary of inputs (ids and short fields only, personal data replaced by placeholders), the outcome (allowed, denied, failed), and when it happened. If someone
 edits or deletes an old entry, a verification check reports it.
 
 **Why this priority**: The audit log is the product's evidence. It is required for the allow-list
@@ -99,14 +101,14 @@ verification check fails and names the broken entry.
 ### User Story 3 - Every run is visible as a trace (Priority: P2)
 
 A reviewer can open a single agent run and see its steps as spans: each model call and each tool
-call, with duration, outcome and the agent that made it, all linked by one run identifier that
+call, with duration, outcome and the agent that made it, all linked by one run id that
 also appears in the structured logs and the audit log.
 
 **Why this priority**: Traces explain *why* and *how long*; the audit log proves *what*. Valuable
 but the audit log and allow-list work without it.
 
 **Independent Test**: Run the demo agent and confirm the trace backend (or local test collector)
-shows one run containing a span per model call and tool call, and that the run identifier matches
+shows one run containing a span per model call and tool call, and that the run id matches
 the one in the audit log and log lines.
 
 **Acceptance Scenarios**:
@@ -171,7 +173,7 @@ results and passes against the baseline; deliberately break the allow-list and c
 - **FR-003**: System MUST validate every tool input against a defined shape and reject invalid
   input before any tool logic runs.
 - **FR-004**: System MUST write one audit entry per tool call (allowed, denied or failed) containing
-  agent, tool, redacted input summary, outcome, run identifier and timestamp.
+  agent, tool, redacted input summary, outcome, run id and timestamp.
 - **FR-005**: Audit entries MUST be append-only and form a single chain across all agents and
   runs, so that altering, removing or reordering any past entry is detectable by a verification
   command that checks the whole chain.
@@ -181,8 +183,8 @@ results and passes against the baseline; deliberately break the allow-list and c
   fake names, since arbitrary names cannot be detected reliably. Other kinds (street addresses,
   government IDs) are out of scope for 001.
 - **FR-007**: System MUST emit one trace span per tool call and per model call, carrying agent,
-  tool or model name, duration and outcome, all under a single run identifier.
-- **FR-008**: Structured log lines MUST include the same run identifier as the trace and audit log.
+  tool or model name, duration and outcome, all under a single run id.
+- **FR-008**: Structured log lines MUST include the same run id as the trace and audit log.
 - **FR-009**: System MUST include a thin demo agent that runs a scripted audit of a synthetic
   report using a deterministic fake model by default, so runs need no API key.
 - **FR-010**: Failure of the trace backend MUST NOT stop a run or lose audit entries.
@@ -204,6 +206,19 @@ results and passes against the baseline; deliberately break the allow-list and c
   "completed with denials" (at least one refusal, none failed), or "failed" (a call failed in a
   way the agent could not recover from). A refused call MUST NOT stop the run by itself.
 
+- **FR-019**: Every commit and every push MUST be scanned for secrets, locally and in CI; a finding
+  blocks the commit or fails the build.
+- **FR-020**: Dependencies MUST be checked for known vulnerabilities in CI, and automatic update
+  proposals MUST be enabled for Python packages and CI actions.
+- **FR-021**: A short threat model (STRIDE-lite) MUST map each threat category to a mitigation with a
+  test, or to an explicitly accepted risk, and MUST state the hash chain's limits.
+- **FR-022**: A health command and a one-page runbook MUST exist, with 2 to 3 service level
+  indicators and targets, and recovery steps for database down, chain broken and traces missing.
+- **FR-023**: The container image MUST build reproducibly from the lock file in CI; a cloud budget
+  alert MUST be defined as code and validated in CI; a rollback procedure MUST be documented.
+- **FR-024**: A small load check MUST record real p50, p95 and throughput for the owner plus up to
+  5 users, and the documentation MUST state the tested limits without claiming more.
+
 ### Key Entities
 
 - **Agent Profile**: a named identity with the set of tools it may call, its purpose and the hash
@@ -214,7 +229,7 @@ results and passes against the baseline; deliberately break the allow-list and c
   Kept separate from the report, which stays unchanged.
 - **Policy Clause (synthetic)**: an ID, title and text of a rule in the demo expense policy.
 - **Tool Call Record**: one attempted tool call: agent, tool, redacted input summary, outcome,
-  duration, run identifier.
+  duration, run id.
 - **Audit Entry**: a tool call record plus the fingerprint of the previous entry in the single
   global chain.
 - **Run**: one execution of the demo agent, identified by a run ID shared by logs, trace and audit,
@@ -239,14 +254,14 @@ results and passes against the baseline; deliberately break the allow-list and c
 - **SC-001**: In the eval set, 100% of calls outside an agent's allow-list are refused and none
   produce a side effect.
 - **SC-002**: 100% of tool calls in a run (allowed, denied and failed) have exactly one audit entry
-  and one trace span with matching run identifier.
+  and one trace span with matching run id.
 - **SC-003**: Altering or deleting any single past audit entry is detected by verification in 100%
   of eval tamper cases.
 - **SC-004**: 0 raw values of the fake personal-data fixtures or of agent tokens appear in any
   audit entry, log line or span across the eval set.
 - **SC-005**: The full eval set meets or exceeds its stored baseline: at least
   90% of all cases passing and 100% of security cases (allow-list, redaction, tamper detection)
-  passing, and completes in under 60 seconds on a laptop with no network.
+  passing, and completes in under 60 seconds on the GitHub CI runner (and no network is used).
 - **SC-006**: Auditing and tracing add a median delay of under
   50 milliseconds per tool call, measured locally, compared with running the same call without them. The figure recorded in the docs MUST be the
   measured one.
@@ -254,6 +269,18 @@ results and passes against the baseline; deliberately break the allow-list and c
   90 days (synthetic demo data) and the retention rule is documented.
 - **SC-008**: A new developer can run the demo agent, the evals and the log verification from the
   README using one documented command each, with no cloud account or API key.
+- **SC-009**: A deliberately planted fake secret is blocked by the local check and fails the CI
+  check in a recorded trial; the trial result is saved in the docs.
+- **SC-010**: The vulnerability check passes with 0 unresolved known vulnerabilities (or each is
+  documented with a reason), and update proposals are enabled.
+- **SC-011**: The threat model covers all 6 STRIDE categories, and each row links to a test or to an
+  accepted-risk note.
+- **SC-012**: The health command returns a failing exit code when the database is down or the chain
+  is broken, and the runbook covers the 3 named failure cases.
+- **SC-013**: The load check of 200 calls at 10 at a time is recorded with its measured p50, p95 and
+  throughput, date and machine.
+- **SC-014**: The image builds in CI from the lock file, the budget definition passes validation, and
+  following the rollback notes once restores the previous version.
 
 ## Assumptions
 

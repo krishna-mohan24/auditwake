@@ -13,7 +13,7 @@ Terms are defined in [docs/glossary.md](../../docs/glossary.md). Constitution II
 failing test, see it fail, then implement.
 
 **Legend**: `[P]` = safe to do in parallel with other `[P]` tasks in the same phase (different files).
-`[US1..US4]` = user story from spec.md. `data-model.md` citations are written `DM:Entity.field`.
+`[US1..US4]` = user story from spec.md. citations to the data model are written `data-model.md Entity.field`.
 
 **Order of ideas** (nothing uses a concept before it is taught): project setup → tests and CI →
 database → fake model → MCP → permissions → audit chain → redaction → traces → evals → measurements.
@@ -46,7 +46,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
 - [ ] T005 Add CI in `.github/workflows/ci.yml` (lint, types, unit tests, pip-audit)
   - **Goal**: every push is checked on GitHub.
   - **Concept**: *CI (continuous integration)* runs your checks automatically; *pip-audit* reports known vulnerable dependencies.
-  - **Test first**: push a branch with a failing test and see CI go red, then fix it.
+  - **Test first**: push a branch with a failing test and see CI go red, then fix it. Also plant a fake secret on a scratch branch and confirm the local hook and CI both block it (SC-009); save the result in `docs/measurements.md`.
   - **Done when**: CI is green on `main`. (Integration and eval jobs are added in T037.)
 - [ ] T006 [P] Add Dependabot in `.github/dependabot.yml`
   - **Goal**: automatic update pull requests for Python and GitHub Actions dependencies.
@@ -62,12 +62,12 @@ database → fake model → MCP → permissions → audit chain → redaction �
 
 ## Phase 2: Foundational (blocks all stories)
 
-- [ ] T008 Create synthetic data and loaders in `data/reports.json`, `data/policy.json`, `src/auditwake/storage/seed.py` (DM:ExpenseReport.report_id, DM:ExpenseReport.items, DM:PolicyClause.clause_id)
+- [ ] T008 Create synthetic data and loaders in `data/reports.json`, `data/policy.json`, `src/auditwake/storage/seed.py` (data-model.md ExpenseReport.report_id, data-model.md ExpenseReport.items, data-model.md PolicyClause.clause_id)
   - **Goal**: 10–20 fake expense reports (some with fake emails, phones, card numbers and names) and 5–8 policy clauses.
   - **Concept**: *synthetic data* is invented data that looks real, so we never risk real personal data (constitution X). Card numbers use known test numbers that pass the Luhn check.
   - **Test first**: unit test that every report validates against its schema and that fake-PII fixtures are listed in `tests/fixtures/fake_pii.json`.
   - **Done when**: tests pass; the fixture list is the source for SC-004 later.
-- [ ] T009 Create the database schema and migrations in `src/auditwake/storage/migrations/0001_init.sql`, `src/auditwake/storage/db.py` (DM:runs.status, DM:audit_entries.seq, DM:audit_entries.entry_hash, DM:flags.report_id, DM:chain_checkpoints.through_seq)
+- [ ] T009 Create the database schema and migrations in `src/auditwake/storage/migrations/0001_init.sql`, `src/auditwake/storage/db.py` (data-model.md runs.status, data-model.md audit_entries.seq, data-model.md audit_entries.entry_hash, data-model.md flags.report_id, data-model.md chain_checkpoints.through_seq)
   - **Goal**: tables for runs, audit entries, flags and checkpoints, plus a trigger that blocks UPDATE and DELETE on audit entries and a restricted app role.
   - **Concept**: a *migration* is a versioned change to the database structure. A *trigger* is code the database runs automatically; here it makes the log append-only. *Least privilege*: the app role can only INSERT and SELECT.
   - **Test first**: integration test that applies the migration, then asserts an UPDATE and a DELETE on `audit_entries` fail for the app role.
@@ -98,29 +98,29 @@ database → fake model → MCP → permissions → audit chain → redaction �
 **Independent test**: run the demo as `reader` and as `auditor`; reader is refused on flag; auditor succeeds.
 
 - [ ] T013 [US1] Write failing unit tests in `tests/unit/test_auth.py`, `tests/unit/test_gate.py`, `tests/unit/test_schemas.py`
-  - **Goal**: tests for token check, default deny, allow-list, unknown tool, invalid input and error shape.
+  - **Goal**: tests for token check, default deny, allow-list, unknown tool, invalid input, a tool that raises or times out, and error shape.
   - **Concept**: *test-first* means a test that fails for the right reason comes before the code.
   - **Done when**: tests exist and fail with "not implemented" (not syntax errors).
-- [ ] T014 [P] [US1] Implement token creation, hashing and verification in `src/auditwake/guardrails/auth.py`, `config/agents.yaml` (DM:AgentProfile.token_sha256, DM:AgentProfile.allowed_tools)
-  - **Goal**: random tokens, SHA-256 hash stored, constant-time compare, agents loaded from YAML (unknown tool name fails startup).
+- [ ] T014 [P] [US1] Implement token creation, hashing and verification in `src/auditwake/guardrails/auth.py`, `config/agents.yaml` (data-model.md AgentProfile.name (unique), data-model.md AgentProfile.token_sha256, data-model.md AgentProfile.allowed_tools)
+  - **Goal**: random tokens, unique agent names, SHA-256 hash stored, constant-time compare, agents loaded from YAML (unknown tool name fails startup).
   - **Concept**: a *hash* is a one-way fingerprint. Random 256-bit tokens can't be guessed, so a fast hash is enough (ADR-0006). *Constant-time compare* avoids leaking information through timing.
   - **Test first**: T013 tests for good token, bad token, missing token, tampered YAML.
   - **Done when**: auth tests pass; no raw token ever appears in YAML or logs.
-- [ ] T015 [P] [US1] Implement tool input models in `src/auditwake/tools/schemas.py` (DM:ExpenseReport.report_id, DM:PolicyClause.clause_id, DM:flags.reason; unknown fields rejected; 10 KB limit)
+- [ ] T015 [P] [US1] Implement tool input models in `src/auditwake/tools/schemas.py` (data-model.md ExpenseReport.report_id, data-model.md PolicyClause.clause_id, data-model.md flags.reason; unknown fields rejected; 10 KB limit)
   - **Goal**: Pydantic models for the three tools' inputs.
   - **Concept**: *validation* rejects bad input at the door, before any logic runs. *Pydantic* defines data shapes in Python and checks them.
   - **Test first**: T013 schema tests (bad id pattern, extra field, 501-char reason, oversized input).
   - **Done when**: schema tests pass.
 - [ ] T016 [US1] Implement the gate in `src/auditwake/guardrails/gate.py`
-  - **Goal**: one function every tool call passes: authenticate → allow-list → validate → run → record outcome through `AuditSink`.
+  - **Goal**: one function every tool call passes: authenticate → allow-list → validate → run → record outcome through `AuditSink`. A tool that raises an error or times out gives `internal_error` with outcome `failed`. A test-only `bypass` option skips audit and tracing so T039 can measure overhead; it is never enabled in the CLI.
   - **Concept**: a *single choke point* means no tool can skip the safety checks. *Default deny*: anything not explicitly allowed is refused.
-  - **Test first**: T013 gate tests including unknown agent and unknown tool.
+  - **Test first**: T013 gate tests including unknown agent, unknown tool, a tool that raises and a tool that times out.
   - **Done when**: gate tests pass using the in-memory sink.
 - [ ] T017 [US1] Write failing integration test in `tests/integration/test_demo_agent.py` (reader vs auditor)
   - **Goal**: encode spec Story 1 acceptance scenarios 1–5 as a test against real Postgres.
   - **Concept**: an *acceptance test* checks behaviour the way a user sees it.
   - **Done when**: the test exists and fails.
-- [ ] T018 [US1] Implement the three tools in `src/auditwake/tools/expense.py`, `src/auditwake/tools/policy.py`, `src/auditwake/tools/flag.py`, `src/auditwake/storage/flags.py` (DM:flags.flag_id, DM:flags.agent, DM:flags.run_id)
+- [ ] T018 [US1] Implement the three tools in `src/auditwake/tools/expense.py`, `src/auditwake/tools/policy.py`, `src/auditwake/tools/flag.py`, `src/auditwake/storage/flags.py` (data-model.md flags.flag_id, data-model.md flags.agent, data-model.md flags.run_id)
   - **Goal**: get report, get clause (from the JSON data) and flag (inserts a separate flag record; report never modified).
   - **Concept**: *immutability of source data*: the flag is a new record, so tests always start from the same data.
   - **Test first**: unit tests for not-found and for flagging twice creating two records.
@@ -134,8 +134,8 @@ database → fake model → MCP → permissions → audit chain → redaction �
   - **Goal**: freeze tool names, descriptions and schemas; CI fails on unplanned change (FR-014).
   - **Concept**: a *contract test* protects what other programs depend on, so we notice breaking changes.
   - **Done when**: snapshot committed; editing a tool description makes the test fail.
-- [ ] T021 [US1] Implement run status and the scripted demo agent in `src/auditwake/agent/runner.py`, `src/auditwake/agent/profiles.py`, `src/auditwake/agent/scripted.py` (DM:runs.run_id, DM:runs.status)
-  - **Goal**: agent that follows a script, continues after a refusal, ends as completed, completed_with_denials or failed (FR-018).
+- [ ] T021 [US1] Implement run status and the scripted demo agent in `src/auditwake/agent/runner.py`, `src/auditwake/agent/profiles.py`, `src/auditwake/agent/scripted.py` (data-model.md runs.run_id, data-model.md runs.status)
+  - **Goal**: agent that follows a script, continues after a refusal, ends as completed, completed_with_denials or failed (FR-018). The run id is generated here in trace-id format (32 hex characters) so T033 can reuse it as the trace id.
   - **Concept**: an *agent loop* asks a model for the next action, runs a tool, feeds back the result. Ours uses the fake model.
   - **Test first**: T017 integration test.
   - **Done when**: T017 passes.
@@ -155,7 +155,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
 **Independent test**: run a mixed session, verify OK, edit one row, verify reports BROKEN.
 
 - [ ] T023 [US2] Write failing tests in `tests/unit/test_audit_chain.py`, `tests/unit/test_redaction.py`, `tests/integration/test_audit_log.py`
-  - **Goal**: tests for hashing, ordering under 20 parallel calls with no gaps, tamper detection (edit, delete, reorder), trigger blocking, redaction, fail-closed.
+  - **Goal**: tests for hashing, ordering under 20 parallel calls with no gaps, tamper detection (edit, delete, reorder), trigger blocking, redaction, fail-closed for both the flag tool and a read-only tool (result withheld).
   - **Concept**: *concurrency tests* run many operations at once to expose race conditions.
   - **Done when**: tests exist and fail.
 - [ ] T024 [P] [US2] Implement redaction in `src/auditwake/guardrails/redaction.py`
@@ -168,7 +168,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
   - **Concept**: *canonical form* guarantees identical data hashes identically, otherwise verification would fail randomly.
   - **Test first**: T023 hashing tests (same data = same hash; one changed byte = different hash).
   - **Done when**: tests pass.
-- [ ] T026 [US2] Implement the Postgres audit sink in `src/auditwake/storage/audit_repo.py` (DM:audit_entries.prev_hash, DM:audit_entries.input_summary, DM:audit_entries.outcome)
+- [ ] T026 [US2] Implement the Postgres audit sink in `src/auditwake/storage/audit_repo.py` (data-model.md audit_entries.prev_hash, data-model.md audit_entries.input_summary, data-model.md audit_entries.outcome)
   - **Goal**: append takes an advisory lock, reads the last hash, inserts the next entry.
   - **Concept**: an *advisory lock* makes concurrent writers take turns, so the chain has one order (ADR-0005).
   - **Test first**: T023 parallel-append test (20 calls, 20 entries, valid chain).
@@ -176,14 +176,14 @@ database → fake model → MCP → permissions → audit chain → redaction �
 - [ ] T027 [US2] Make flag + audit write one transaction and fail closed in `src/auditwake/storage/flags.py`, `src/auditwake/guardrails/gate.py`
   - **Goal**: if the audit write fails, roll back the flag and return `audit_unavailable`.
   - **Concept**: a *transaction* makes several writes succeed or fail together. *Fail closed*: no record means no action.
-  - **Test first**: T023 test that stops Postgres writes mid-call and checks nothing was stored.
+  - **Test first**: T023 test that stops Postgres writes mid-call and checks nothing was stored and that a read-only tool's result is withheld.
   - **Done when**: test passes.
 - [ ] T028 [US2] Implement chain verification and `verify-log` in `src/auditwake/telemetry/verify.py`, `src/auditwake/cli.py`
   - **Goal**: walk the chain; print `OK: N entries verified` or `BROKEN at seq=K: reason`; exit code 1 when broken.
   - **Concept**: *verification* recomputes hashes and compares links, so any past edit shows up.
   - **Test first**: T023 tamper tests (edit, delete, reorder) all produce BROKEN with the right `seq`.
   - **Done when**: tests pass; quickstart step 8 works.
-- [ ] T029 [P] [US2] Implement the 90-day retention job with checkpoints in `src/auditwake/storage/retention.py`, `docs/retention.md` (DM:chain_checkpoints.entry_hash)
+- [ ] T029 [P] [US2] Implement the 90-day retention job with checkpoints in `src/auditwake/storage/retention.py`, `docs/retention.md` (data-model.md chain_checkpoints.entry_hash)
   - **Goal**: prune entries older than 90 days after saving a checkpoint hash; verification can start from the checkpoint (SC-007).
   - **Concept**: *retention* limits how long data is kept; the *checkpoint* keeps the remaining chain verifiable after pruning.
   - **Test first**: integration test with backdated entries; verification still OK after pruning.
@@ -212,7 +212,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
   - **Done when**: the run still finishes and the audit chain is intact with the backend down.
 - [ ] T033 [US3] Add spans to the gate and model calls; set run id = trace id in `src/auditwake/guardrails/gate.py`, `src/auditwake/agent/runner.py`
   - **Goal**: every call produces one span; the run id printed by the CLI equals the trace id.
-  - **Test first**: T031 span tests.
+  - **Test first**: T031 span tests, plus a cross-check that a run's spans and audit entries match one-to-one (SC-002).
   - **Done when**: tests pass; quickstart step 7 shows the trace in Jaeger.
 - [ ] T034 [P] [US3] Add JSON logging with trace id in `src/auditwake/telemetry/logging.py`
   - **Goal**: structured log lines carrying the run id; redaction applied before output (FR-008, FR-006).
@@ -245,7 +245,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
   - **Test first**: mutation check: weaken the allow-list in a scratch branch and confirm CI fails.
   - **Done when**: CI green normally, red on the mutated branch (record the run link in the PR).
 - [ ] T038 [P] [US4] Add the fake-PII leak scan in `tests/integration/test_no_leaks.py`
-  - **Goal**: after the eval set, search audit entries, log output and spans for every fixture value and every agent token; expect zero (SC-004).
+  - **Goal**: after the eval set, search audit entries, log output and spans for every fixture value and every agent token; expect zero (SC-004). Also assert that for every run the number of spans equals the number of audit entries (SC-002).
   - **Done when**: test passes and fails if redaction is disabled.
 
 **Checkpoint**: all four stories work.
@@ -255,7 +255,7 @@ database → fake model → MCP → permissions → audit chain → redaction �
 ## Phase 7: Polish and cross-cutting
 
 - [ ] T039 [P] Measure auditing and tracing overhead in `scripts/bench_overhead.py`, `docs/measurements.md`
-  - **Goal**: median per-call time with and without auditing and tracing (SC-006, target under 50 ms).
+  - **Goal**: median per-call time with and without auditing and tracing (SC-006, target under 50 ms), using the test-only `bypass` option from T016 as the baseline.
   - **Concept**: *median* is the middle value, so one slow outlier doesn't distort it.
   - **Done when**: the real measured number, date and machine are written in `docs/measurements.md`. If it misses the target, record that and open a follow-up; never edit the number.
 - [ ] T040 [P] Run a small load check in `scripts/load_check.py`, `docs/measurements.md`
@@ -288,6 +288,21 @@ database → fake model → MCP → permissions → audit chain → redaction �
 
 ---
 
+## Branch and commit plan
+
+Each phase is its own branch and pull request, named by the rule in `docs/branching.md`, with commits in
+the fixed emoji format (for example `✨🤖 FEAT-AGENT: add allow-list gate`).
+
+| Phase | Branch | Notes |
+|---|---|---|
+| 1 Setup | `FEAT-INFRA/project-setup` | tooling, compose, CI |
+| 2 Foundational | `FEAT-APP/foundation` | schema, fake model, types, spike |
+| 3 US1 | `FEAT-AGENT/permissioned-tools` | MVP |
+| 4 US2 | `FEAT-APP/audit-log-chain` | |
+| 5 US3 | `FEAT-APP/run-tracing` | |
+| 6 US4 | `FEAT-AGENT/baseline-evals` | CI gate |
+| 7 Polish | `FEAT-INFRA/container-budget-ci`, `DOC-APP/measurements-and-docs` | split by side |
+
 ## Dependencies and order
 
 - Phase 1 → Phase 2 → Phase 3 (US1) → Phase 4 (US2) → Phase 5 (US3) → Phase 6 (US4) → Phase 7.
@@ -307,11 +322,11 @@ database → fake model → MCP → permissions → audit chain → redaction �
 | NFR | Task | Test or proof |
 |---|---|---|
 | 1 Testability | T004, T005, T010, T020, T035–T038 | pytest layers, contract snapshot, eval gate, `make check` |
-| 2 Scalability (right-sized) | T009, T026, T040 | parallel-append test, load check numbers |
-| 3 Security | T014–T016, T024, T026, T038, T042 | auth, gate, redaction, leak scan, threat model |
-| 4 Observability | T031–T034, T043 | span and log tests, health test, runbook |
-| 5 Cost control | T044, T041 | `terraform validate`, image size, $0 check in T046 |
-| 6 Maintainability | T001, T002, T005, T006, T041, T045 | ruff, mypy, CI, Dependabot, README, rollback |
+| 2 Scalability (right-sized) | T009, T026, T040 (FR-024, SC-013) | parallel-append test, load check numbers |
+| 3 Security | T005, T006, T014–T016, T024, T026, T038, T042 (FR-019 to FR-021, SC-009 to SC-011) | auth, gate, redaction, leak scan, secret-scan trial, pip-audit, threat model |
+| 4 Observability | T031–T034, T043 (FR-022, SC-012) | span and log tests, health test, runbook |
+| 5 Cost control | T044, T041 (FR-023, SC-014) | `terraform validate`, image size, $0 check in T046 |
+| 6 Maintainability | T001, T002, T005, T006, T041, T045 (FR-020, FR-023, SC-010, SC-014) | ruff, mypy, CI, Dependabot, README, rollback rehearsal |
 | 7 Data and privacy | T008, T029 | fixture tests, retention test, `docs/retention.md` |
 | 8 Viewer UX | not in 001 | assigned to feature 004 |
 

@@ -11,7 +11,7 @@
   "tool": "flag_expense_report",
   "outcome": "denied",
   "reason": "not_permitted",
-  "input_summary": {"report_id": "EXP-0007", "reason": "[REDACTED]"},
+  "input_summary": {"report_id": "EXP-0007", "reason": "Dinner with [NAME] over limit"},
   "duration_ms": 3,
   "prev_hash": "…64 hex…",
   "entry_hash": "…64 hex…"

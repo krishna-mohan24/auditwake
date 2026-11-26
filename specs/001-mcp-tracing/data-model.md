@@ -11,7 +11,7 @@ Plain-language notes in italics for beginners.
 
 **ExpenseReport** (`data/reports.json`, synthetic)
 - `report_id`, `submitter` (fake name), `submitter_email` (fake), `status`,
-  `items[]` = {`category`, `amount`, `currency`, `date`, `note`}, `card_last4_or_number` (fake test number).
+  `items[]` = {`category`, `amount`, `currency`, `date`, `note`}, `payment_number` (fake test number).
 - Read-only. Never modified.
 
 **PolicyClause** (`data/policy.json`, synthetic)
@@ -41,6 +41,17 @@ Plain-language notes in italics for beginners.
 **chain_checkpoints** (for retention)
 - `through_seq`, `entry_hash`, `created_at`. Before pruning entries older than 90 days, the hash of the
   last pruned entry is saved here so verification can start from the checkpoint.
+
+## Audit entry input summary (what is stored)
+
+| Tool | Stored in `audit_entries.input_summary` |
+|---|---|
+| `get_expense_report` | `report_id` |
+| `get_policy_clause` | `clause_id` |
+| `flag_expense_report` | `report_id` and `reason` with personal data replaced by placeholders (`[NAME]`, `[EMAIL]`, `[PHONE]`, `[CARD]`) |
+
+Tool results are never stored in the audit entry; only the outcome and reason code are. Unknown tools
+store the tool name only.
 
 ## State transitions
 
