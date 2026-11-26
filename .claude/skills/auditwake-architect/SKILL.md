@@ -89,7 +89,12 @@ Default topology: **compute and database are separate, replaceable pieces.**
 
 Terraform and CI must not hard-code GCP-only assumptions beyond the deploy layer.
 
-## 5. How to use this skill
+## 5. Dev tooling
+
+Optional local tools (CodeBurn, Ponytail, Headroom) are tracked in `docs/dev-tooling.md`. They never
+become project dependencies. Record measured results there, not vendor claims.
+
+## 6. How to use this skill
 
 - Before proposing a choice, list 2 to 3 options with: monthly cost (verified or marked), lock-in
   and swap cost, failure impact, and local-first impact.
