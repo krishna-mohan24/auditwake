@@ -1,9 +1,9 @@
 version = 1
 revision = 3
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 
 [[package]]
-name = "auditwake"
+name = "auditwake-backend"
 version = "0.1.0"
 source = { editable = "." }
 

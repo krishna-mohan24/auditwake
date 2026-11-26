@@ -2,12 +2,12 @@
 
 from importlib.metadata import version
 
-import auditwake
+import auditwake_backend
 
 
 def test_package_has_version() -> None:
-    assert auditwake.__version__
+    assert auditwake_backend.__version__
 
 
 def test_version_matches_packaging_metadata() -> None:
-    assert auditwake.__version__ == version("auditwake")
+    assert auditwake_backend.__version__ == version("auditwake-backend")

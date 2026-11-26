@@ -1,9 +1,9 @@
 [project]
-name = "auditwake"
+name = "auditwake-backend"
 version = "0.1.0"
-description = "Flight recorder and governance layer for AI agents (produces audit evidence)."
+description = "Auditwake backend: audit log, tracing and storage. Never imports the agents project (ADR-0011)."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = []
 
 [dependency-groups]
@@ -14,7 +14,7 @@ requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/auditwake"]
+packages = ["auditwake_backend"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
