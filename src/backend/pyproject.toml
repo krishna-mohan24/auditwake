@@ -3,7 +3,7 @@ name = "auditwake-backend"
 version = "0.1.0"
 description = "Auditwake backend: audit log, tracing and storage. Never imports the agents project (ADR-0011)."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = []
 
 [dependency-groups]
